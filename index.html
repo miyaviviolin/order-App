@@ -161,7 +161,7 @@
         return '<tr>' +
           '<td style="text-align:left; padding-left:14px;">' + it.item_name.replace(/</g,"&lt;") + '</td>' +
           '<td style="font-size:17px; color:#c53030;">' + oq + unitStr + '</td>' +
-          '<td><input type="number" id="price-' + it.id + '" value="' + (it.unit_price || '') + '" placeholder="単価" min="0" style="width:100px; padding:6px; text-align:right; font-size:14px;"></td>' +
+                   '<td><input type="text" inputmode="numeric" pattern="[0-9]*" id="price-' + it.id + '" value="' + (it.unit_price || '') + '" placeholder="単価" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')" style="width:100px; padding:6px; text-align:right; font-size:15px;"></td>' +
           '<td><button type="button" class="btn btn-primary" style="padding:7px 14px;" onclick="deliverAll(' + it.id + ')">✔ 全数納品</button></td>' +
           '<td>' + partHtml + '</td>' +
         '</tr>';
