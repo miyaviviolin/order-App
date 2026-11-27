@@ -46,31 +46,34 @@
   </style>
 </head>
 <body>
-    <div class="screen" id="login-screen">
+      <div class="screen" id="login-screen">
     <div style="display:flex; justify-content:flex-end; margin-bottom:4px;">
       <button type="button" class="btn" id="open-admin-auth-btn" style="font-size:12px;">⚙️ 管理画面</button>
     </div>
-    <div class="login-center" style="margin: 0 auto auto;">
+    <div class="login-center" style="margin: 0 auto auto; max-width: 680px;">
       <h1 class="login-title" style="margin-bottom:10px;">🦷 ふくい歯科クリニック<br>受注・納品登録システム</h1>
-      <div class="clock" id="clock" style="margin-bottom:16px; padding:10px;">読み込み中...</div>
-      <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">業者名を選択してください</div>
-      <select id="login-vendor" style="margin-bottom:12px;"><option value="">-- 業者名を選択 --</option></select>
-      <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">4桁パスワード</div>
-      <input type="password" id="login-pass" maxlength="4" inputmode="numeric" placeholder="****" style="text-align:center; letter-spacing:8px; font-size:20px; margin-bottom:16px;">
+      <div class="clock" id="clock" style="max-width:440px; margin:0 auto 16px; padding:10px;">読み込み中...</div>
+      <div style="max-width:440px; margin:0 auto;">
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">業者名を選択してください</div>
+        <select id="login-vendor" style="margin-bottom:12px;"><option value="">-- 業者名を選択 --</option></select>
+        <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">4桁パスワード</div>
+        <input type="password" id="login-pass" maxlength="4" inputmode="numeric" placeholder="****" style="text-align:center; letter-spacing:8px; font-size:20px; margin-bottom:22px;">
+      </div>
 
-      <div style="text-align:left; padding:14px 16px; border-radius:16px; background:#e6f5ec; box-shadow: inset 3px 3px 6px #c5dcd0, inset -3px -3px 6px #ffffff; font-size:13px; line-height:1.7; color:#2d4235;">
-        <div style="text-align:center; font-weight:bold; color:#2b8a3e; margin-bottom:4px;">～入室方法～</div>
+      <div style="text-align:left; font-size:26px; font-weight:bold; line-height:1.5; color:#2b8a3e;">
+        <div style="text-align:center; margin-bottom:6px;">～入室方法～</div>
         <div>①業者名を選択</div>
         <div>②４桁PINを入力</div>
         <div>③右下部の【入室】ボタンをクリックしてください</div>
-        <div style="font-size:11px; color:#496b57; margin-top:4px; padding-left:1em; text-indent:-1em;">※業者名の新規登録やPINを忘れた場合は管理者までお知らせください</div>
+        <div style="padding-left:1em; text-indent:-1em; margin-top:4px;">※業者名の新規登録やPINを忘れた場合は管理者までお知らせください</div>
       </div>
     </div>
     <div class="footer-bar">
-      <span class="ver-text">Ver.1.1.3</span>
+      <span class="ver-text">Ver.1.1.4</span>
       <button type="button" class="btn btn-primary" id="enter-btn" style="padding:14px 36px; font-size:17px;">入室 ➡</button>
     </div>
   </div>
+
 
 
   <div class="screen" id="main-screen" style="display:none;">
@@ -99,7 +102,7 @@
       </div>
     </div>
     <div class="footer-bar">
-      <span class="ver-text">Ver.1.1.3</span>
+      <span class="ver-text">Ver.1.1.4</span>
       <button type="button" class="btn" id="exit-btn" style="padding:10px 28px; font-size:15px;">終了</button>
     </div>
   </div>
