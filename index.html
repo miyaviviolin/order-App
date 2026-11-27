@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>291DC注文・納品システム</title>
+  <link rel="apple-touch-icon" id="app-icon">
+  <script>
+    setTimeout(function(){
+      var c = document.createElement("canvas"); c.width = c.height = 512;
+      var x = c.getContext("2d");
+      var g = x.createLinearGradient(0, 0, 512, 512);
+      g.addColorStop(0, "#43e97b"); g.addColorStop(1, "#38b2ac");
+      x.fillStyle = g; x.fillRect(0, 0, 512, 512);
+      x.fillStyle = "#ffffff"; x.font = "900 185px sans-serif";
+      x.textAlign = "center"; x.textBaseline = "middle";
+      x.shadowColor = "rgba(0,80,70,0.35)"; x.shadowBlur = 18; x.shadowOffsetY = 8;
+      x.fillText("291", 256, 268);
+      document.getElementById("app-icon").href = c.toDataURL("image/png");
+    }, 500);
+  </script>
+  <style>
+    * { box-sizing: border-box; font-family: sans-serif; }
+    body { margin: 0; padding: 14px; background: #e6f4ea; color: #2d4235; display: flex; justify-content: center; min-height: 100vh; touch-action: manipulation; }
+    .screen { width: 100%; max-width: 1080px; background: #e6f4ea; border-radius: 24px; padding: 20px; box-shadow: 10px 10px 20px #c4d9ca, -10px -10px 20px #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: calc(100vh - 28px); }
+    .btn { background: #e6f4ea; border: none; border-radius: 12px; padding: 10px 16px; font-weight: bold; color: #2d4235; cursor: pointer; box-shadow: 3px 3px 6px #c4d9ca, -3px -3px 6px #ffffff; font-size: 13px; }
+    .btn:active { box-shadow: inset 2px 2px 5px #c4d9ca, inset -2px -2px 5px #ffffff; }
+    .btn-primary { background: #38a169; color: #fff; }
+    .btn-part { background: #ed8936; color: #fff; padding: 6px 10px; font-size: 12px; border-radius: 10px; }
+    .btn-all { background: #3182ce; color: #fff; padding: 6px 12px; font-size: 12px; border-radius: 10px; }
+    .btn-neu-sm { background: #e6f4ea; color: #2d4235; padding: 5px 10px; font-size: 12px; border-radius: 10px; box-shadow: 3px 3px 5px #c4d9ca, -3px -3px 5px #ffffff; }
+    select, input[type="text"], input[type="number"], input[type="password"] { width: 100%; padding: 11px; border: none; border-radius: 12px; background: #e6f4ea; box-shadow: inset 3px 3px 6px #c4d9ca, inset -3px -3px 6px #ffffff; font-size: 15px; color: #2d4235; }
+    .login-center { max-width: 440px; width: 100%; margin: auto; text-align: center; }
+    .login-title { font-size: 26px; color: #276749; margin: 0 0 12px; }
+    .clock { font-size: 20px; font-weight: bold; color: #22543d; margin-bottom: 22px; padding: 12px; border-radius: 16px; box-shadow: inset 3px 3px 6px #c4d9ca, inset -3px -3px 6px #ffffff; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #cce3d3; }
+    .table-wrap { overflow-x: auto; flex: 1; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0 6px; min-width: 780px; }
+    th { text-align: center; font-size: 13px; color: #22543d; padding: 6px; font-weight: bold; }
+    td { background: #e6f4ea; padding: 8px; text-align: center; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px #c4d9ca; }
+    td:first-child { border-radius: 12px 0 0 12px; }
+    td:last-child { border-radius: 0 12px 12px 0; }
+    .price-in { width: 95px !important; padding: 6px 8px !important; text-align: right; font-size: 14px !important; }
+    .deliv-ctrl { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+    .part-sel { width: auto !important; padding: 5px 8px !important; font-size: 13px !important; }
+    .footer-bar { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 8px; }
+    .ver-text { font-size: 12px; color: #688773; font-weight: bold; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+    .modal-body { width: 100%; max-width: 400px; background: #e6f4ea; border-radius: 22px; padding: 22px; box-shadow: 8px 8px 16px #9fb8a6; }
+  </style>
+</head>
+<body>
+  <div class="screen" id="login-screen">
+    <div></div>
+    <div class="login-center">
+      <h1 class="login-title">🦷 291DC注文・納品システム</h1>
+      <div class="clock" id="clock">読み込み中...</div>
+      <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">業者名を選択</div>
+      <select id="login-vendor" style="margin-bottom:12px;"><option value="">-- 業者名を選択 --</option></select>
+      <div style="text-align:left; font-size:13px; font-weight:bold; margin-bottom:4px;">4桁パスワード</div>
+      <input type="password" id="login-pin" maxlength="4" inputmode="numeric" placeholder="例：1234" style="margin-bottom:16px; text-align:center; letter-spacing:6px;">
+      <button type="button" class="btn" id="open-vendor-btn" style="width:100%;">業者の新規登録・削除</button>
+    </div>
+    <div class="footer-bar">
+      <span class="ver-text">Ver.1.0.0</span>
+      <button type="button" class="btn btn-primary" id="enter-btn" style="padding:14px 36px; font-size:17px;">入室 ➡</button>
+    </div>
+  </div>
+
+  <div class="screen" id="main-screen" style="display:none;">
+    <div style="display:flex; flex-direction:column; flex:1;">
+      <div class="top-bar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <strong style="font-size:19px; color:#276749;">📦 注文・納品管理一覧</strong>
+          <span id="vendor-badge" style="background:#9ae6b4; padding:4px 12px; border-radius:10px; font-size:13px; font-weight:bold;"></span>
+        </div>
+        <span style="font-size:12px; color:#4a6b56;">※納品時は単価(円)を入力して納品ボタンを押してください</span>
+      </div>
+
+      <div id="status" style="color:#e53e3e; font-size:12px; font-weight:bold; text-align:center;"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32%; text-align:left; padding-left:12px;">品名</th>
+              <th style="width:13%;">残り注文数</th>
+              <th style="width:17%;">単価（税抜/税込）</th>
+              <th style="width:38%;">納品操作（全数納品 / 一部納品）</th>
+            </tr>
+          </thead>
+          <tbody id="order-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span class="ver-text">Ver.1.0.0</span>
+      <button type="button" class="btn" id="exit-btn" style="padding:10px 28px; font-size:15px;">終了</button>
+    </div>
+  </div>
+  <div class="modal" id="vendor-modal">
+    <div class="modal-body">
+      <h3 style="margin:0 0 14px; text-align:center; color:#276749;">業者の新規登録・削除</h3>
+      <label style="font-size:12px; font-weight:bold;">業者名（在庫アプリの注文先と一致させてください）</label>
+      <input type="text" id="new-vname" placeholder="例：ヒロ" style="margin:4px 0 10px;">
+      <label style="font-size:12px; font-weight:bold;">4桁パスワード（数字4桁）</label>
+      <div style="display:flex; gap:8px; margin:4px 0 16px;">
+        <input type="text" id="new-vpin" maxlength="4" inputmode="numeric" placeholder="1234">
+        <button type="button" class="btn btn-primary" id="add-vendor-btn" style="white-space:nowrap;">登録</button>
+      </div>
+      <label style="font-size:12px; font-weight:bold;">登録済み業者一覧</label>
+      <div id="vdel-box" style="max-height:170px; overflow-y:auto; margin:8px 0 16px;"></div>
+      <button type="button" class="btn" id="vendor-close" style="width:100%;">閉じる</button>
+    </div>
+  </div>
