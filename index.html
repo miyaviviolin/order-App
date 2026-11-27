@@ -239,13 +239,15 @@
       } else { alert("IDまたはパスワードが違います"); }
     };
     document.getElementById("admin-close").onclick = function() { document.getElementById("admin-modal").style.display = "none"; };
-    document.getElementById("adm-add-btn").onclick = async function() {
+     document.getElementById("adm-add-btn").onclick = async function() {
       var n = document.getElementById("adm-new-v").value.trim(), p = document.getElementById("adm-new-p").value.trim();
       if (!n) return alert("業者名を入力してください");
       if (p && p.length !== 4) return alert("パスワードは4桁の数字で入力してください");
-      await api("/vendors", { method: "POST", body: JSON.stringify({ name: n, passcode: p }) });
+      var res = await api("/vendors", { method: "POST", body: JSON.stringify({ name: n, passcode: p }) });
+      if (!res.ok) return alert("登録エラー: " + await res.text());
       document.getElementById("adm-new-v").value = ""; document.getElementById("adm-new-p").value = ""; await loadAll();
     };
+
     async function saveVendorPass(vName) {
       var p = document.getElementById("vp-" + vName).value.trim();
       if (p.length !== 4) return alert("4桁のパスワードを入力してください");
