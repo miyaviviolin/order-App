@@ -182,7 +182,7 @@
       var myOrders = items.filter(function(it){ return it.vendor === currentVendor && Number(it.ordered_qty || 0) > 0; });
       var tbody = document.getElementById("order-tbody");
       if (myOrders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="border-radius:12px; color:#6b8776; padding:24px;">現在、注文中の品目はありません</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="border-radius:12px; color:#6b8776; padding:24px;">現在、新規の受注品目はありません</td></tr>';
         return;
       }
       tbody.innerHTML = myOrders.map(function(it) {
