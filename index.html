@@ -231,23 +231,26 @@
     }
     loadAll(); setInterval(loadAll, 5000);
     async function doneConsult(id) { if (confirm("スタッフへの対応が完了しましたか？（この通知を消去します）")) { await api("/consultations?id=eq." + id, { method: "DELETE" }); await loadAll(); } }
-    async function deliverAll(id) {
+       async function deliverAll(id) {
       var it = items.find(function(x){ return x.id === id; }); if (!it) return;
-      var price = Number(document.getElementById("price-" + id).value);
-      if (!price || price <= 0) return alert("単価（円）を入力してください");
+      var rawPrice = document.getElementById("price-" + id).value.trim();
+      if (rawPrice === "") return alert("単価（円）を入力してください（0円の場合は 0 と入力）");
+      var price = Number(rawPrice);
       var oq = Number(it.ordered_qty), td = Number(it.today_delivery || 0);
       await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: 0, today_delivery: td + oq, unit_price: price, delivery_checked: false }) });
-      alert(it.item_name + " を全数納品（" + oq + (it.unit||"個") + "）として送信しました！"); await loadAll();
+      alert(it.item_name + " を全数納品（" + oq + (it.unit||"個") + "・単価" + price + "円）として送信しました！"); await loadAll();
     }
     async function deliverPart(id) {
       var it = items.find(function(x){ return x.id === id; }); if (!it) return;
-      var price = Number(document.getElementById("price-" + id).value);
-      if (!price || price <= 0) return alert("単価（円）を入力してください");
+      var rawPrice = document.getElementById("price-" + id).value.trim();
+      if (rawPrice === "") return alert("単価（円）を入力してください（0円の場合は 0 と入力）");
+      var price = Number(rawPrice);
       var partQty = Number(document.getElementById("part-" + id).value);
       var remain = Number(it.ordered_qty) - partQty, td = Number(it.today_delivery || 0);
       await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: remain, today_delivery: td + partQty, unit_price: price, delivery_checked: false }) });
-      alert(it.item_name + " を一部納品（" + partQty + (it.unit||"個") + "）しました。残注文数は " + remain + (it.unit||"個") + " です。"); await loadAll();
+      alert(it.item_name + " を一部納品（" + partQty + (it.unit||"個") + "・単価" + price + "円）しました。残注文数は " + remain + (it.unit||"個") + " です。"); await loadAll();
     }
+
     document.getElementById("enter-btn").onclick = function() {
       var vName = document.getElementById("login-vendor").value, pw = document.getElementById("login-pass").value.trim();
       if (!vName) return alert("業者名を選択してください");
