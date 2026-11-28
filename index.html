@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>291DC注文・納品システム</title>
+  <title>受注・納品登録システム</title>
   <link rel="apple-touch-icon" id="app-icon">
   <script>
     setTimeout(function(){
@@ -22,12 +22,12 @@
   <style>
     * { box-sizing: border-box; font-family: sans-serif; }
     body { margin: 0; padding: 14px; background: #e6f5ec; color: #2d4235; display: flex; justify-content: center; min-height: 100vh; touch-action: manipulation; }
-    .screen { width: 100%; max-width: 1080px; background: #e6f5ec; border-radius: 24px; padding: 20px; box-shadow: 10px 10px 20px #c5dcd0, -10px -10px 20px #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: calc(100vh - 28px); }
+    .screen { width: 100%; max-width: 1120px; background: #e6f5ec; border-radius: 24px; padding: 20px; box-shadow: 10px 10px 20px #c5dcd0, -10px -10px 20px #ffffff; display: flex; flex-direction: column; justify-content: space-between; min-height: calc(100vh - 28px); }
     .btn { background: #e6f5ec; border: none; border-radius: 12px; padding: 10px 16px; font-weight: bold; color: #2d4235; cursor: pointer; box-shadow: 3px 3px 6px #c5dcd0, -3px -3px 6px #ffffff; font-size: 13px; }
     .btn:active { box-shadow: inset 2px 2px 5px #c5dcd0, inset -2px -2px 5px #ffffff; }
     .btn-primary { background: #2f9e44; color: #fff; transition: opacity 0.2s; }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
-    .btn-sub { background: #3b82f6; color: #fff; padding: 6px 10px; font-size: 12px; }
+    .btn-sub { background: #3b82f6; color: #fff; padding: 7px 10px; font-size: 12px; white-space: nowrap; }
     .btn-danger { background: #feb2b2; color: #4a3b3e; padding: 5px 10px; font-size: 12px; }
     select, input[type="text"], input[type="password"], input[type="number"] { width: 100%; padding: 11px; border: none; border-radius: 12px; background: #e6f5ec; box-shadow: inset 3px 3px 6px #c5dcd0, inset -3px -3px 6px #ffffff; font-size: 15px; color: #2d4235; }
     .login-center { max-width: 680px; width: 100%; margin: 0 auto auto; text-align: center; }
@@ -35,11 +35,14 @@
     .clock { font-size: 19px; font-weight: bold; color: #22543d; max-width: 440px; margin: 0 auto 16px; padding: 10px; border-radius: 16px; box-shadow: inset 3px 3px 6px #c5dcd0, inset -3px -3px 6px #ffffff; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #cde3d6; }
     .table-wrap { overflow-x: auto; flex: 1; }
-    table { width: 100%; border-collapse: separate; border-spacing: 0 8px; min-width: 780px; }
-    th { text-align: center; font-size: 13px; color: #22543d; padding: 6px; font-weight: bold; }
-    td { background: #e6f5ec; padding: 10px 8px; text-align: center; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px #c5dcd0; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0 8px; min-width: 820px; table-layout: fixed; }
+    th { text-align: center; font-size: 13px; color: #22543d; padding: 6px 4px; font-weight: bold; }
+    td { background: #e6f5ec; padding: 9px 6px; text-align: center; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px #c5dcd0; }
     td:first-child { border-radius: 12px 0 0 12px; }
     td:last-child { border-radius: 0 12px 12px 0; }
+    .double-sep { border-right: 4px double #6b8776 !important; }
+    .name-confirmed { color: #94a89c; opacity: 0.55; }
+    .chk-order { width: 22px; height: 22px; accent-color: #2f9e44; cursor: pointer; vertical-align: middle; }
     .footer-bar { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 16px; padding-top: 8px; }
     .ver-text { font-size: 12px; color: #6b8776; font-weight: bold; }
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
@@ -67,11 +70,11 @@
         <div>① 業者名を選択</div>
         <div>② ４桁PINを入力</div>
         <div>③【入室】ボタンを押下</div>
-        <div style="padding-left:1em; text-indent:-1em; margin-top:4px;"><br>※業者名の変更・新規登録や、PINを忘れた場合は<br>　　　　管理者までお知らせください</div>
+        <div style="padding-left:1em; text-indent:-1em; margin-top:4px;">※業者名の新規登録やPINを忘れた場合は<br>　　管理者までお知らせください</div>
       </div>
     </div>
     <div class="footer-bar">
-      <span class="ver-text">Ver.1.2.4</span>
+      <span class="ver-text">Ver.1.2.5</span>
       <span class="ver-text" style="text-align:center;">© 2026 Fukui Dental Clinic. All Rights Reserved.</span>
       <button type="button" class="btn btn-primary" id="enter-btn" disabled style="padding:14px 36px; font-size:17px;">入室 ➡</button>
     </div>
@@ -83,7 +86,7 @@
           <strong style="font-size:19px; color:#2b8a3e;">📦 注文・納品一覧</strong>
           <span id="vendor-badge" style="background:#b2f2bb; padding:4px 12px; border-radius:10px; font-size:13px; font-weight:bold;"></span>
         </div>
-        <span style="font-size:12px; color:#496b57; font-weight:bold;">※単価を入力して全数または一部納品を押してください</span>
+        <span style="font-size:12px; color:#496b57; font-weight:bold;">※納品時は単価を入力して全数または一部納品を押してください</span>
       </div>
       <div id="status" style="color:#e53e3e; font-size:12px; font-weight:bold; text-align:center;"></div>
       <div id="vendor-consult-box"></div>
@@ -91,11 +94,12 @@
         <table>
           <thead>
             <tr>
-              <th style="width:32%; text-align:left; padding-left:14px;">品名</th>
-              <th style="width:14%;">残注文数</th>
-              <th style="width:16%;">単価(円)</th>
-              <th style="width:16%;">全数納品</th>
-              <th style="width:22%;">一部納品（数量指定）</th>
+              <th style="width:27%; text-align:left; padding-left:14px;">品名</th>
+              <th style="width:11%;">注文数</th>
+              <th class="double-sep" style="width:11%;">受注確認</th>
+              <th style="width:19%;">全数納品</th>
+              <th style="width:19%;">一部納品（数量指定）</th>
+              <th style="width:13%;">単価(円)</th>
             </tr>
           </thead>
           <tbody id="order-tbody"></tbody>
@@ -103,7 +107,7 @@
       </div>
     </div>
     <div class="footer-bar">
-      <span class="ver-text">Ver.1.2.4</span>
+      <span class="ver-text">Ver.1.2.5</span>
       <button type="button" class="btn" id="exit-btn" style="padding:10px 28px; font-size:15px;">終了</button>
     </div>
   </div>
@@ -182,7 +186,7 @@
       var myOrders = items.filter(function(it){ return it.vendor === currentVendor && Number(it.ordered_qty || 0) > 0; });
       var tbody = document.getElementById("order-tbody");
       if (myOrders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="border-radius:12px; color:#6b8776; padding:24px;">現在、新規の受注品目はありません</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="border-radius:12px; color:#6b8776; padding:24px;">現在、注文中の品目はありません</td></tr>';
         return;
       }
       tbody.innerHTML = myOrders.map(function(it) {
@@ -191,15 +195,17 @@
         var opts = "";
         for (var n = 1; n < oq; n++) opts += '<option value="' + n + '">' + n + unitStr + '</option>';
         var partHtml = oq > 1
-          ? '<div style="display:inline-flex; gap:6px; align-items:center;"><select id="part-' + it.id + '" tabindex="-1" style="width:auto; padding:5px 8px; font-size:13px;">' + opts + '</select><button type="button" class="btn btn-sub" onclick="deliverPart(' + it.id + ')">一部納品</button></div>'
+          ? '<div style="display:inline-flex; gap:5px; align-items:center;"><button type="button" class="btn btn-sub" onclick="deliverPart(' + it.id + ')">一部納品</button><select id="part-' + it.id + '" tabindex="-1" style="width:auto; padding:5px 6px; font-size:13px;">' + opts + '</select></div>'
           : '<span style="color:#a0aec0; font-size:12px;">-</span>';
         var pVal = (savedPrices["price-" + it.id] !== undefined) ? savedPrices["price-" + it.id] : (it.unit_price || '');
+        var nameCls = it.order_confirmed ? ' class="name-confirmed"' : '';
         return '<tr>' +
-          '<td style="text-align:left; padding-left:14px;">' + it.item_name.replace(/</g,"&lt;") + '</td>' +
-          '<td style="font-size:17px; color:#c53030;">' + oq + unitStr + '</td>' +
-          '<td><input type="text" inputmode="numeric" pattern="[0-9]*" id="price-' + it.id + '" value="' + pVal + '" placeholder="単価" onkeydown="if(event.key===\'Enter\')this.blur()" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')" style="width:100px; padding:6px; text-align:right; font-size:15px;"></td>' +
+          '<td' + nameCls + ' style="text-align:left; padding-left:14px;">' + it.item_name.replace(/</g,"&lt;") + '</td>' +
+          '<td style="font-size:16px; color:#c53030;">' + oq + unitStr + '</td>' +
+          '<td class="double-sep"><input type="checkbox" class="chk-order" ' + (it.order_confirmed ? 'checked' : '') + ' onchange="toggleOrderConfirm(' + it.id + ', this.checked)"></td>' +
           '<td><button type="button" class="btn btn-primary" style="padding:7px 14px;" onclick="deliverAll(' + it.id + ')">✔ 全数納品</button></td>' +
           '<td>' + partHtml + '</td>' +
+          '<td><input type="text" inputmode="numeric" pattern="[0-9]*" id="price-' + it.id + '" value="' + pVal + '" placeholder="単価" onkeydown="if(event.key===\'Enter\')this.blur()" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')" style="width:82px; padding:6px; text-align:right; font-size:14px;"></td>' +
         '</tr>';
       }).join("");
 
@@ -241,13 +247,17 @@
       } catch (e) { document.getElementById("status").innerText = "エラー: " + e.message; }
     }
     loadAll(); setInterval(loadAll, 5000);
+    async function toggleOrderConfirm(id, isChecked) {
+      await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ order_confirmed: isChecked }) });
+      await loadAll();
+    }
     async function doneConsult(id) { if (confirm("スタッフへの対応が完了しましたか？（この通知を消去します）")) { await api("/consultations?id=eq." + id, { method: "DELETE" }); await loadAll(); } }
     async function deliverAll(id) {
       var it = items.find(function(x){ return x.id === id; }); if (!it) return;
       var rawPrice = document.getElementById("price-" + id).value.trim();
       if (rawPrice === "") return alert("単価（円）を入力してください（0円の場合は 0 と入力）");
       var price = Number(rawPrice), oq = Number(it.ordered_qty), td = Number(it.today_delivery || 0);
-      await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: 0, today_delivery: td + oq, unit_price: price, delivery_checked: false }) });
+      await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: 0, order_confirmed: false, today_delivery: td + oq, unit_price: price, delivery_checked: false }) });
       alert(it.item_name + " を全数納品（" + oq + (it.unit||"個") + "・単価" + price + "円）として送信しました！"); await loadAll();
     }
     async function deliverPart(id) {
