@@ -211,10 +211,13 @@
         var r1 = await api("/inventory?select=*&order=id.asc");
         if (!r1.ok) throw new Error(await r1.text());
         items = await r1.json();
-        var r2 = await api("/consultations?select=*&order=id.asc");
-        if (r2.ok) consults = await r2.json();
-        if (currentVendor) renderOrders();
-        document.getElementById("status").innerText = "";
+              var r2 = await api("/consultations?select=*&order=id.asc");
+      if (r2.ok) consults = await r2.json();
+      var act = document.activeElement;
+      var isEditing = act && act.id && (act.id.indexOf("price-") === 0 || act.id.indexOf("part-") === 0);
+      if (currentVendor && !isEditing) renderOrders();
+      document.getElementById("status").innerText = "";
+
       } catch (e) { document.getElementById("status").innerText = "エラー: " + e.message; }
     }
     loadAll(); setInterval(loadAll, 5000);
