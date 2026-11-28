@@ -234,3 +234,78 @@
       } catch (e) { document.getElementById("status").innerText = "エラー: " + e.message; }
     }
     loadAll(); setInterval(loadAll, 5000);
+    async function doneConsult(id) { if (confirm("スタッフへの対応が完了しましたか？（この通知を消去します）")) { await api("/consultations?id=eq." + id, { method: "DELETE" }); await loadAll(); } }
+    async function deliverAll(id) {
+      var it = items.find(function(x){ return x.id === id; }); if (!it) return;
+      var rawPrice = document.getElementById("price-" + id).value.trim();
+      if (rawPrice === "") return alert("単価（円）を入力してください（0円の場合は 0 と入力）");
+      var price = Number(rawPrice), oq = Number(it.ordered_qty), td = Number(it.today_delivery || 0);
+      await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: 0, today_delivery: td + oq, unit_price: price, delivery_checked: false }) });
+      alert(it.item_name + " を全数納品（" + oq + (it.unit||"個") + "・単価" + price + "円）として送信しました！"); await loadAll();
+    }
+    async function deliverPart(id) {
+      var it = items.find(function(x){ return x.id === id; }); if (!it) return;
+      var rawPrice = document.getElementById("price-" + id).value.trim();
+      if (rawPrice === "") return alert("単価（円）を入力してください（0円の場合は 0 と入力）");
+      var price = Number(rawPrice), partQty = Number(document.getElementById("part-" + id).value);
+      var remain = Number(it.ordered_qty) - partQty, td = Number(it.today_delivery || 0);
+      await api("/inventory?id=eq." + id, { method: "PATCH", body: JSON.stringify({ ordered_qty: remain, today_delivery: td + partQty, unit_price: price, delivery_checked: false }) });
+      alert(it.item_name + " を一部納品（" + partQty + (it.unit||"個") + "・単価" + price + "円）しました。残注文数は " + remain + (it.unit||"個") + " です。"); await loadAll();
+    }
+    document.getElementById("enter-btn").onclick = function() {
+      var vName = document.getElementById("login-vendor").value, pw = document.getElementById("login-pass").value.trim();
+      if (!vName) return alert("業者名を選択してください");
+      var vObj = vendors.find(function(v){ return v.name === vName; });
+      if (!vObj || !vObj.passcode) return alert("この業者はまだパスワードが設定されていません。管理画面から設定してください。");
+      if (vObj.passcode !== pw) return alert("4桁パスワードが正しくありません");
+      currentVendor = vName; document.getElementById("vendor-badge").innerText = "業者: " + currentVendor;
+      document.getElementById("login-screen").style.display = "none"; document.getElementById("main-screen").style.display = "flex"; renderOrders();
+    };
+    document.getElementById("exit-btn").onclick = function() { currentVendor = ""; document.getElementById("login-pass").value = ""; document.getElementById("main-screen").style.display = "none"; document.getElementById("login-screen").style.display = "flex"; };
+    document.getElementById("open-admin-auth-btn").onclick = function() { document.getElementById("admin-auth-modal").style.display = "flex"; };
+    document.getElementById("auth-close").onclick = function() { document.getElementById("admin-auth-modal").style.display = "none"; };
+    document.getElementById("auth-ok").onclick = function() {
+      var id = document.getElementById("admin-id").value.trim(), pw = document.getElementById("admin-pw").value.trim();
+      if (id === "291DC" && pw === "asdf654zxcv321") { document.getElementById("admin-id").value = ""; document.getElementById("admin-pw").value = ""; document.getElementById("admin-auth-modal").style.display = "none"; document.getElementById("admin-modal").style.display = "flex"; }
+      else { alert("IDまたはパスワードが違います"); }
+    };
+    document.getElementById("admin-close").onclick = function() { document.getElementById("admin-modal").style.display = "none"; loadAll(); };
+    document.getElementById("adm-add-btn").onclick = async function() {
+      var n = document.getElementById("adm-new-v").value.trim(), p = document.getElementById("adm-new-p").value.trim();
+      if (!n) return alert("業者名を入力してください");
+      if (p && p.length !== 4) return alert("パスワードは4桁の数字で入力してください");
+      var res = await api("/vendors", { method: "POST", body: JSON.stringify({ name: n, passcode: p }) });
+      if (!res.ok) return alert("登録エラー: " + await res.text());
+      document.getElementById("adm-new-v").value = ""; document.getElementById("adm-new-p").value = "";
+      document.getElementById("admin-modal").style.display = "none"; await loadAll(); document.getElementById("admin-modal").style.display = "flex";
+    };
+    async function updateVendor(idx) {
+      var v = vendors[idx]; if (!v) return;
+      var newName = document.getElementById("vn-" + idx).value.trim();
+      var newPass = document.getElementById("vp-" + idx).value.trim();
+      var nameChanged = newName !== v.name;
+      var passChanged = newPass !== (v.passcode || "");
+      if (!nameChanged && !passChanged) return alert("変更箇所がありません");
+      if (nameChanged && passChanged) return alert("一度の操作では、業者名とPINのどちらか一方しか変更できません。");
+      if (nameChanged) {
+        if (!newName) return alert("業者名を入力してください");
+        if (vendors.some(function(x, j){ return j !== idx && x.name === newName; })) return alert("すでに同じ業者名が登録されています");
+        var res = await api("/vendors?name=eq." + encodeURIComponent(v.name), { method: "PATCH", body: JSON.stringify({ name: newName }) });
+        if (!res.ok) return alert("変更エラー: " + await res.text());
+        await api("/inventory?vendor=eq." + encodeURIComponent(v.name), { method: "PATCH", body: JSON.stringify({ vendor: newName }) });
+        await api("/consultations?vendor=eq." + encodeURIComponent(v.name), { method: "PATCH", body: JSON.stringify({ vendor: newName }) });
+        alert("業者名を「" + newName + "」に変更しました");
+      } else {
+        if (newPass.length !== 4) return alert("PINは4桁で入力してください");
+        await api("/vendors?name=eq." + encodeURIComponent(v.name), { method: "PATCH", body: JSON.stringify({ passcode: newPass }) });
+        alert(v.name + " のPINを変更しました");
+      }
+      document.getElementById("admin-modal").style.display = "none"; await loadAll(); document.getElementById("admin-modal").style.display = "flex";
+    }
+    async function delVendor(idx) {
+      var v = vendors[idx]; if (!v) return;
+      if (confirm(v.name + " を削除しますか？")) { await api("/vendors?name=eq." + encodeURIComponent(v.name), { method: "DELETE" }); document.getElementById("admin-modal").style.display = "none"; await loadAll(); document.getElementById("admin-modal").style.display = "flex"; }
+    }
+  </script>
+</body>
+</html>
